@@ -205,6 +205,23 @@ One-time setup (from the primary checkout at `~/src/itscape`):
 git worktree add -b auto-update ~/src/auto-update/itscape main
 ```
 
+The wrapper runs `git fetch origin` and `git merge origin/main` under
+`set -e`, so the repo needs a GitHub `origin` with `main` pushed or every
+scheduled run aborts before doing anything.  A freshly `git init`'d tracker
+must `git remote add origin https://github.com/suominen/itscape.git` and
+`git push -u origin main` before the timer is worth enabling.
+
+To run a refresh immediately (same path the timer takes):
+
+```
+systemctl --user start itscape-tracker-update.service
+```
+
+It is a `oneshot`, so the command blocks until the run finishes; follow its
+output with `journalctl --user -u itscape-tracker-update`.  Run the trackers
+**one at a time**, never in parallel — they share the `~/src/linux/*`
+reference clones.
+
 Wire the timer by symlinking both units into `~/.config/systemd/user/` with
 relative links (`ln -sr`) and enabling it:
 
@@ -218,7 +235,9 @@ systemctl --user enable --now itscape-tracker-update.timer
 
 The timer fires at `06,18:05` — staggered from the sibling trackers
 (ipv6_frag_escape `:05`, cifswitch `:20`, pintheft `:35`, januscape `:50`) so the shared
-kernel clones are not fetched simultaneously.
+kernel clones are not fetched simultaneously.  Verify the live set with
+`systemctl --user list-timers | grep tracker` — this in-doc list has gone
+stale before.
 
 ## Tearing down the auto-update
 
