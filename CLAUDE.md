@@ -303,10 +303,12 @@ agent; the agent inspects via the `origin/<branch>` remote-tracking refs
 SHA, so search by upstream reference / subject:
 
 ```
-git -C ~/src/linux/stable log origin/linux-<series>.y --grep=13031fb6b835 --grep='translation cache reference' --format='%h %s'
+git -C ~/src/linux/stable log v<series>..origin/linux-<series>.y --grep=13031fb6b835 --grep='translation cache reference' --format='%h %s'
 ```
 
-Empty output ⇒ still unpatched. Confirm the fix landed mainline in v7.1
+Empty output ⇒ still unpatched. Keep the range bounded to `v<series>..` —
+an unbounded subject grep over the whole branch history can match an
+ancient unrelated commit and read as a false "fixed". Confirm the fix landed mainline in v7.1
 with:
 
 ```
