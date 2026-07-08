@@ -1,0 +1,116 @@
+You are running headless from cron to refresh the ITScape patch tracker.
+The wrapper has already fetched origin and checked out the auto-update
+branch with origin/main merged forward, and has also refreshed the local
+kernel clones under ~/src/linux/{stable,kvm,vulns} and the nixpkgs clone at
+~/src/nixos/nixpkgs — inspect them via the `origin/...` remote-tracking refs
+without re-fetching.
+
+ITScape (CVE-2026-46316) is a KVM/arm64 guest-to-host escape in the Linux
+kernel: a translation-cache double-put in vgic_its_invalidate_cache() (it
+puts the iterated pointer instead of the value returned by xa_erase(), from
+mutually-non-exclusive contexts) drops a vgic_irq's cache reference more
+than once under concurrency, freeing it while an ITE still maps it — a
+use-after-free a guest with EL1 can drive to host-kernel code execution.
+The canonical fix is 13031fb6b835 (KVM: arm64: vgic-its: Drop the
+translation cache reference only for the erased entry), first released in
+v7.1. The bug was introduced by 8201d1028caa in v6.10 (2024-04-25), so the
+reachable window is 6.10 through 7.0 and kernels OLDER than 6.10 are NOT
+affected. It is arm64-only; the x86 sibling is Januscape (CVE-2026-53359),
+tracked separately.
+
+References:
+- Public PoC (V4bel): https://github.com/V4bel/ITScape
+- Kernel fix: https://github.com/torvalds/linux/commit/13031fb6b8357fbbcded2a7f4cba73e4781ee594
+- The Hacker News: https://thehackernews.com/2026/07/16-year-old-linux-kvm-flaw-lets-guest.html
+
+Per-branch fixed versions and per-distro status all live in
+site/content/_index.md (the canonical tracker). Read it first rather than
+relying on anything cached here.
+
+Working-tree hygiene: the wrapper refuses to run on a dirty tree
+(`git status --porcelain`, which counts untracked files too), so a stray
+file left in the worktree blocks every subsequent scheduled run. Stream any
+fetch through a pipe — `curl -fsSL <url> | grep …` — and never save a
+download into the worktree. If you genuinely need a scratch file, create it
+under a `mktemp -d` directory and delete it before you finish; the only
+thing you may leave behind is the edited tracker (and its commit).
+
+1. Read CLAUDE.md to learn the project conventions (especially the
+   single-axis kernel verdict, the arm64-only scope, the < 6.10 not-affected
+   boundary, the status-emoji meanings, the "Fixed since" rule, and the date
+   handling), then read site/content/_index.md.
+
+2. Re-verify each entry currently marked vulnerable (:x:), staged
+   (:warning:), or unverified (:grey_question:). "Not affected"
+   (:white_check_mark: with a < 6.10 reason, and the :heavy_minus_sign:
+   upstream rows) only needs revisiting if a distro moves a release to a
+   6.10+ kernel.
+
+   Note on git.kernel.org: cgit HTML pages are Anubis-gated and WebFetch
+   hits the no-JS challenge. Use the persistent local kernel clones —
+   already refreshed by the wrapper, inspect via the `origin/...`
+   remote-tracking refs:
+
+     ~/src/linux/stable   — stable/linux.git
+     ~/src/linux/kvm      — KVM maintainer tree (arm64+x86 fixes land here first)
+     ~/src/linux/vulns    — CNA CVE database (record for CVE-2026-46316)
+
+   Plain-text kernel.org endpoints (e.g. /finger_banner) are still
+   WebFetch-able.
+
+   a. Upstream stable kernels: GET https://www.kernel.org/finger_banner for
+      the current point release per stable tree. Every maintained in-window
+      branch (6.12.y, 6.18.y, 7.0.y, 7.1.y) already carries the fix
+      (6.12.93 / 6.18.35 / 7.0.12 / 7.1). Pre-6.10 branches are not
+      affected. The backport is a cherry-pick with a NEW sha, so search by
+      upstream reference/subject:
+        git -C ~/src/linux/stable log origin/linux-<series>.y \
+          --grep=13031fb6b835 --grep='translation cache reference' --format='%h %s'
+
+   b. CVE record — CVE-2026-46316 is already assigned. The authoritative
+      per-branch introduced:fixed versions are in the vulns.git dyad
+      (inspect via origin/master):
+        git -C ~/src/linux/vulns show \
+          origin/master:cve/published/2026/CVE-2026-46316.dyad
+      Watch NVD / the disclosure sources for a KEV/EPSS update to add to the
+      Summary (the CNA CVSS 8.8 is already recorded).
+
+3. Distro rows — check the ARM64 kernel, and check adoption not cosmetic
+   versions. The per-distro kernel versions in the table are frozen seed
+   snapshots: update a row's recorded version only when its verdict actually
+   changes.
+
+   A kernel < 6.10 is NOT affected; an in-window (6.10–7.0) kernel is fixed
+   only once it carries 13031fb6b835. For each row, re-pull just the
+   distro's arm64 KERNEL version:
+      - Debian: the madison API (version is arch-independent) —
+          curl -fsS 'https://api.ftp-master.debian.org/madison?package=linux&s=sid,forky,trixie,bookworm,bullseye&text=on'
+      - NixOS: the channel kernel pin from the local nixpkgs clone.
+      - Rocky / Amazon: the aarch64 RPM repodata (needs zcat) or advisory.
+      - AlmaLinux (leading indicator for the el10 arm64 row): its blog /
+        errata / dl.almalinux.org aarch64 repodata.
+   Do NOT add a Proxmox row — Proxmox VE is x86-only and is covered by the
+   Januscape tracker.
+
+   zcat / gunzip ARE available — use them for the repodata pulls. Pull only
+   the KERNEL version, and only when a verdict could change.
+
+   Triggering needs guest root/EL1 and there is no runtime mitigation knob;
+   a :warning: is only for a staged-but-unreleased fix. A mitigation is
+   never :white_check_mark:.
+
+   Do NOT record NixOS channel git-revisions anywhere in the tracker.
+
+4. Edit site/content/_index.md to reflect any changes per the conventions in
+   CLAUDE.md. If you make content changes, bump the `lastmod` date. If
+   nothing changed, leave the file alone — don't bump `lastmod` on a no-op
+   run.
+
+5. If you made changes, commit them on the current branch (`auto-update`).
+   Do NOT create a new branch, switch branches, push, or open a PR. The user
+   merges auto-update into main manually. If nothing changed, exit without
+   committing.
+
+If you hit unexpected errors or substantive changes you can't confidently
+encode, commit your best attempt and note open questions in the commit
+message.
