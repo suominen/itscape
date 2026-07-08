@@ -110,7 +110,7 @@ named in the disclosures appear only in prose where relevant.
 |---|---|---|---|---|
 | Debian | sid (unstable) | 7.1.3-1 | 2026-07-08 | :white_check_mark: Fixed — ships 7.1.3 (carries the fix) |
 | Debian | forky (testing) | 7.0.13-1 | 2026-07-08 | :white_check_mark: Fixed — 7.0.13 ≥ 7.0.12 (carries the backport) |
-| Debian | 13 (trixie) | 6.12.86-1 | — | :warning: Fix staged — 6.12.94-1 in proposed-updates (≥ 6.12.93); awaiting stable release |
+| Debian | 13 (trixie) | 6.12.95-1 | 2026-07-08 | :white_check_mark: Fixed — 6.12.95-1 via trixie-security (DSA-6355-1; ≥ 6.12.93) |
 | Debian | 12 (bookworm) | 6.1.170-3 | — | :white_check_mark: Not affected — predates the trigger (< 6.10) |
 | Debian | 11 (bullseye, LTS) | 5.10.223-1 | — | :white_check_mark: Not affected — predates the trigger |
 | NixOS | Unstable | 6.18.38 | 2026-07-08 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
@@ -126,12 +126,10 @@ named in the disclosures appear only in prose where relevant.
 
 Debian's arm64 `linux` is affected only from 6.10 on. **sid** (`7.1.3-1`,
 carries the fix) and **forky** (testing, `7.0.13-1` ≥ the first-fixed
-7.0.12) are fixed. **trixie** stable is at `6.12.86-1` (vulnerable), but
-Debian has staged `6.12.94-1` in `trixie-proposed-updates`; since 6.12.94 ≥
-6.12.93 it carries the backport — a stable-release upload is expected
-imminently. The Debian security tracker records the fix target at 6.12.95-1.
-**bookworm** (6.1) and **bullseye** (5.10) predate the v6.10 trigger and are
-not affected.
+7.0.12) are fixed. **trixie** stable received `6.12.95-1` via
+`trixie-security` (DSA-6355-1); since 6.12.95 ≥ 6.12.93 it carries the
+backport — trixie is now fixed. **bookworm** (6.1) and **bullseye** (5.10)
+predate the v6.10 trigger and are not affected.
 
 ### NixOS
 
@@ -250,21 +248,21 @@ Neither is a fix; the kernel hole remains until patched.
 
 ### Distributions
 
-- **Debian** (via the dak `madison` API and security tracker): unstable
-  `7.1.3-1` and testing `7.0.13-1` carry the fix → fixed; stable
-  `6.12.86-1` is in-window below 6.12.93 → vulnerable in the stable suite;
-  `trixie-proposed-updates` now has `6.12.94-1` (≥ 6.12.93, carries the
-  backport) — Debian security tracker records the fix target at `6.12.95-1`;
-  status upgraded to `:warning:`. Oldstable `6.1.170-3` and oldoldstable
+- **Debian** (via the dak `madison` API and Debian security tracker): unstable
+  `7.1.3-1` and testing `7.0.13-1` carry the fix → fixed. Trixie received
+  `6.12.95-1` via `trixie-security` (DSA-6355-1; ≥ 6.12.93, carries the
+  backport) → trixie now fixed; status flipped from `:warning:` to
+  `:white_check_mark:`. Oldstable `6.1.170-3` and oldoldstable
   `5.10.223-1` predate the v6.10 trigger → not affected.
 - **NixOS** (via the local nixpkgs clone at both channel revisions): the
   default `linuxPackages` (`linux_6_18`) is `6.18.38` on both nixos-unstable
   and nixos-26.05 (≥ 6.18.35) → carries the backport → fixed. No change.
 - **Rocky / RHEL family**: only el10 (6.12) is in-window; el9 (5.14) and
-  el8 (4.18) predate the trigger → not affected. AlmaLinux 10 shipped the
-  fix in `6.12.0-211.29.1.el10_2` (aarch64, per AlmaLinux updateinfo.xml);
-  Rocky Linux 10 is at `6.12.0-211.28.1.el10_2` without the fix (Rocky
-  updateinfo had 0 matches for CVE-2026-46316) — Rocky 10 row remains `:x:`.
+  el8 (4.18) predate the trigger → not affected. AlmaLinux 10 is now at
+  `6.12.0-211.30.1.el10_2` (fix first landed in `211.29.1.el10_2`, per
+  AlmaLinux primary.xml); Rocky Linux 10 is still at
+  `6.12.0-211.28.1.el10_2` without the fix (Rocky primary.xml has no
+  `211.29+` release yet) — Rocky 10 row remains `:x:`.
 - **Amazon Linux**: ALAS CVE page confirmed: AL2023 default `kernel` (6.1)
   and AL2 (4.14) **Not Affected** (< 6.10). The opt-in `kernel6.12` stream
   was fixed via ALAS2023-2026-1894 and `kernel6.18` via ALAS2023-2026-1881
