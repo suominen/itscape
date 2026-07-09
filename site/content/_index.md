@@ -118,8 +118,12 @@ named in the disclosures appear only in prose where relevant.
 | Rocky Linux | 10 | 6.12.0-211.28.1.el10_2 | — | :x: Vulnerable — RHEL fixed (RHSA-2026:34911, 211.30.1); Rocky rebuild pending |
 | Rocky Linux | 9 | 5.14.0-687.17.1.el9_8 | — | :x: Vulnerable — RHEL 9 affected via vGIC backport; RHSA-2026:36018 fix (687.22.1) not yet in Rocky |
 | Rocky Linux | 8 | 4.18.0-553.el8_10 | — | :white_check_mark: Not affected — predates the trigger |
-| Amazon Linux | 2023 | 6.1.x (amzn2023) | — | :white_check_mark: Not affected — default stream < 6.10 |
-| Amazon Linux | 2 | 4.14.x (amzn2) | — | :white_check_mark: Not affected — predates the trigger |
+| Amazon Linux | 2023 (kernel 6.1) | 6.1.176-220.360 | — | :white_check_mark: Not affected — predates v6.10 |
+| Amazon Linux | 2023 (kernel6.12) | 6.12.94-123.176 | 2026-06-22 | :white_check_mark: Fixed — ALAS2023-2026-1894 (≥ 6.12.92-122.166) |
+| Amazon Linux | 2023 (kernel6.18) | 6.18.36-69.136 | 2026-06-22 | :white_check_mark: Fixed — ALAS2023-2026-1881 (≥ 6.18.35-68.127) |
+| Amazon Linux | 2 (kernel 4.14) | 4.14.355-284.737 | — | :white_check_mark: Not affected — predates v6.10 |
+| Amazon Linux | 2 (kernel-5.10) | 5.10.259-258.1043 | — | :white_check_mark: Not affected — predates v6.10 |
+| Amazon Linux | 2 (kernel-5.15) | 5.15.210-148.245 | — | :white_check_mark: Not affected — predates v6.10 |
 {.distros}
 
 ### Debian
@@ -156,12 +160,12 @@ RHEL.
 
 ### Amazon Linux
 
-Amazon has assessed the default streams **not affected**: AL2023's default
-`kernel` is the 6.1 stream and AL2's is 4.14 — both predate v6.10. AL2023's
-opt-in `kernel6.12` / `kernel6.18` streams were in-window and have been
-fixed: `kernel6.12` via ALAS2023-2026-1894 and `kernel6.18` via
-ALAS2023-2026-1881 (both released 2026-06-22). The livepatch packages were
-also updated in the same window.
+Each Amazon kernel stream is a row above. AL2023's default `kernel` (6.1)
+and all of AL2 (4.14 / 5.10 / 5.15) predate v6.10 and are not affected; only
+AL2023's opt-in `kernel6.12` / `kernel6.18` streams are in-window, and both
+have been fixed (ALAS2023-2026-1894 / -1881, 2026-06-22, with matching
+livepatch updates). Status verified from the repodata `updateinfo.xml`, not
+the JS-rendered per-CVE ALAS pages.
 
 ## Detection
 
