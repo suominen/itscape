@@ -93,9 +93,17 @@ thing you may leave behind is the edited tracker (and its commit).
         madison only for the base-suite version and the sid/testing lineage:
           curl -fsS 'https://api.ftp-master.debian.org/madison?package=linux&s=sid,forky,trixie,bookworm,bullseye&text=on'
       - NixOS: the channel kernel pin from the local nixpkgs clone.
-      - Rocky / Amazon: the aarch64 RPM repodata (needs zcat) or advisory.
-      - AlmaLinux (leading indicator for the el10 arm64 row): its blog /
-        errata / dl.almalinux.org aarch64 repodata.
+      - Rocky / RHEL: the Red Hat security data API is the authoritative
+        leading signal (RHEL is upstream of Rocky/Alma) — WebFetch
+        https://access.redhat.com/security/cve/CVE-2026-46316 or curl the
+        matching .json and read the kernel fix_state + affected_release. It
+        confirms RHEL 8/9 (4.18/5.14) are Not affected (predate 6.10); only
+        RHEL 10 (6.12) is affected. While RHEL 10 fix_state is "Affected"
+        with no affected_release, Rocky 10 stays :x:; when the RHSA + fixed
+        NVR appears, confirm via Rocky BaseOS aarch64 repodata (zcat)
+        reaching it, cross-check AlmaLinux via OSV
+        https://api.osv.dev/v1/vulns/CVE-2026-46316.
+      - Amazon: the aarch64 RPM repodata (zcat) or the ALAS advisory.
    Do NOT add a Proxmox row — Proxmox VE is x86-only and is covered by the
    Januscape tracker.
 

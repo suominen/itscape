@@ -361,6 +361,26 @@ to curl. The wrapper refreshes the clone on every run.
 are gzipped; `zcat` is in the headless allowlist. Track the **aarch64**
 repos.*
 
+**For the EL rows, the Red Hat security data API is the authoritative
+leading signal** — RHEL is upstream of Rocky and AlmaLinux.  Read the
+per-CVE record's `package_state` (per-product `fix_state`: Affected / Not
+affected / Will not fix / Out of support scope) and `affected_release` (the
+RHSA advisory ID + fixed kernel NVR once a fix ships):
+
+```
+curl -fsSL 'https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-46316.json'
+```
+
+(or WebFetch `https://access.redhat.com/security/cve/CVE-2026-46316`.)  It
+also confirms the affected window: RHEL 8 (4.18) and RHEL 9 (5.14) predate
+the v6.10 origin, so Red Hat marks them **Not affected** — only RHEL 10
+(6.12) is affected.  While the RHEL 10 `kernel` `fix_state` is **Affected**
+with an empty `affected_release`, the Rocky 10 row stays `:x:`; when
+`affected_release` gains the RHEL 10 `kernel` NVR, Rocky rebuilds it as an
+RLSA (AlmaLinux fastest — cross-check OSV
+`https://api.osv.dev/v1/vulns/CVE-2026-46316`).  The aarch64 repodata below
+confirms the Rocky ship.
+
 Both ship `kernel` as an RPM; pull versions from repodata (`repomd.xml` →
 the `*-primary.xml.gz` index) and pick the numerically-highest `rel`
 (`sort -V`).
@@ -368,8 +388,9 @@ the `*-primary.xml.gz` index) and pick the numerically-highest `rel`
 - **Rocky** BaseOS aarch64:
   `https://dl.rockylinux.org/pub/rocky/<8|9|10>/BaseOS/aarch64/os`. Only
   **Rocky 10** (6.12 el10) is in-window; Rocky 9 (5.14) and 8 (4.18) predate
-  the trigger and are not affected. AlmaLinux is the leading indicator for
-  the fixed el10 kernel version.
+  the trigger and are not affected. The Rocky 10 row flips only when its
+  BaseOS aarch64 kernel NVR reaches the RHEL 10 fixed build from the Red Hat
+  record above.
 - **Amazon Linux** core (aarch64/Graviton): AL2023 default `kernel` is the
   6.1 stream (< 6.10, not affected); its opt-in `kernel6.12` / `kernel6.18`
   streams are in-window. AL2 `kernel` is 4.14 (not affected). Resolve the
