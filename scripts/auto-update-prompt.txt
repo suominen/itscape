@@ -103,7 +103,11 @@ thing you may leave behind is the edited tracker (and its commit).
         NVR appears, confirm via Rocky BaseOS aarch64 repodata (zcat)
         reaching it, cross-check AlmaLinux via OSV
         https://api.osv.dev/v1/vulns/CVE-2026-46316.
-      - Amazon: the aarch64 RPM repodata (zcat) or the ALAS advisory.
+      - Amazon: the ALAS signal is the repodata updateinfo.xml.gz (maps CVE
+        -> ALAS -> fixed NVR), NOT the JS per-CVE ALAS page. Fetch the
+        aarch64 <base>repodata/updateinfo.xml.gz (zcat), grep the CVE; check
+        each stream (default kernel 6.1 not affected < 6.10, but opt-in
+        kernel6.12/kernel6.18 in-window). Versions from primary.xml.gz.
    Do NOT add a Proxmox row — Proxmox VE is x86-only and is covered by the
    Januscape tracker.
 

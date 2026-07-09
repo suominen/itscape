@@ -391,11 +391,15 @@ the `*-primary.xml.gz` index) and pick the numerically-highest `rel`
   the trigger and are not affected. The Rocky 10 row flips only when its
   BaseOS aarch64 kernel NVR reaches the RHEL 10 fixed build from the Red Hat
   record above.
-- **Amazon Linux** core (aarch64/Graviton): AL2023 default `kernel` is the
-  6.1 stream (< 6.10, not affected); its opt-in `kernel6.12` / `kernel6.18`
-  streams are in-window. AL2 `kernel` is 4.14 (not affected). Resolve the
-  aarch64 `mirror.list` then read repodata; cross-check
-  `alas.aws.amazon.com`.
+- **Amazon Linux** (aarch64/Graviton): the ALAS signal is the repodata
+  **`updateinfo.xml.gz`** (maps CVE → ALAS → fixed kernel NVR) — the per-CVE
+  ALAS HTML pages are JS-rendered and return nothing headlessly. AL2023's
+  default `kernel` is 6.1 (< 6.10, not affected) but the opt-in `kernel6.12`
+  / `kernel6.18` streams are in-window — so grep updateinfo for the CVE and
+  check **each** stream (this is how the kernel6.12/kernel6.18 ALAS fixes
+  were found); AL2 `kernel` is 4.14 (not affected). Resolve the aarch64
+  `mirror.list`, fetch `<base>repodata/updateinfo.xml.gz` (grep the CVE) and
+  `primary.xml.gz` (current versions).
 
 ## Debian kernel version source
 
