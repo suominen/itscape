@@ -378,17 +378,31 @@ the `*-primary.xml.gz` index) and pick the numerically-highest `rel`
 
 ## Debian kernel version source
 
-Use the dak-backed madison API for the source-package version per suite
-(unstable=sid, testing=forky, stable=trixie, oldstable=bookworm,
-oldoldstable=bullseye); the version is arch-independent:
+**The security tracker, not a madison base-version compare, is authoritative for Debian status.** Two traps make a naive version check wrong: the base suite lags the `-security` upload that ships the fix, and Debian often backports the fix to a version *below* the upstream first-fixed release — so comparing a base-suite version against the upstream first-fixed release can read an already-fixed suite as vulnerable.
+
+Read status and fixed version straight from the security tracker. WebFetch the human-readable per-CVE page, or `curl` the JSON and read the `CVE-2026-46316` block for each release's `status` (resolved/open) and the version under `repositories` (a `<suite>-security` entry means the fix shipped as a security update):
+
+```
+curl -fsSL 'https://security-tracker.debian.org/tracker/data/json'
+```
+
+Use the dak madison API only for the base-suite version and the sid/testing lineage (unstable=sid, testing=forky, stable=trixie, oldstable=bookworm, oldoldstable=bullseye):
 
 ```
 curl -fsSL 'https://api.ftp-master.debian.org/madison?package=linux&s=sid,forky,trixie,bookworm,bullseye&text=on'
 ```
 
-Only suites at 6.10+ are affected: trixie (6.12) is in-window; forky/sid
-(7.0/7.1) carry the fix; bookworm (6.1) and bullseye (5.10) are not
-affected.
+For a *Fixed since* date, use the `first_seen` of the fixed version in snapshot.debian.org:
+
+```
+curl -fsSL 'https://snapshot.debian.org/mr/package/linux/<version>/srcfiles?fileinfo=1'
+```
+
+Affected-window note (distinct from fix status): ITScape was introduced in
+**6.10**, so **bookworm (6.1) and bullseye (5.10) predate the bug and are
+not affected** — only trixie (6.12) and the 7.x suites (forky/sid) are
+in-window. That is the introduction boundary, a version fact; the security
+tracker above still decides whether an in-window suite has been *fixed*.
 
 ## Key sources to monitor
 

@@ -83,7 +83,14 @@ thing you may leave behind is the edited tracker (and its commit).
    A kernel < 6.10 is NOT affected; an in-window (6.10–7.0) kernel is fixed
    only once it carries 13031fb6b835. For each row, re-pull just the
    distro's arm64 KERNEL version:
-      - Debian: the madison API (version is arch-independent) —
+      - Debian: the SECURITY TRACKER is authoritative for status, not a
+        madison version compare — the base suite lags the -security upload,
+        and Debian backports below the upstream first-fixed release. WebFetch
+        the per-CVE page or curl the JSON:
+          curl -fsS 'https://security-tracker.debian.org/tracker/data/json'
+        read each release's status + the version under `repositories`
+        (a <suite>-security entry = shipped as a security update). Use
+        madison only for the base-suite version and the sid/testing lineage:
           curl -fsS 'https://api.ftp-master.debian.org/madison?package=linux&s=sid,forky,trixie,bookworm,bullseye&text=on'
       - NixOS: the channel kernel pin from the local nixpkgs clone.
       - Rocky / Amazon: the aarch64 RPM repodata (needs zcat) or advisory.
