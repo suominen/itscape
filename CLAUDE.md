@@ -110,6 +110,11 @@ version only (or `:grey_question:` when unverified). Label NixOS channels in
 the **Release** column in friendly form (`Unstable`, `26.05`). Keep the
 `{.distros}` block attribute on the line **immediately after** the table.
 
+Amazon rows are **one per kernel stream** — name the stream in the
+**Release** column (`2023 (kernel6.12)`, `2 (kernel-5.10)`); keep every
+stream (default + opt-in) as its own row, and add a row when Amazon ships a
+new stream. (The aarch64 builds share the same stream names.)
+
 Track the **arm64** build of each distro. **Proxmox VE is x86-only** — it
 does not appear in this tracker (it is covered by Januscape); do not add a
 Proxmox row here.
