@@ -3,7 +3,7 @@ title: "ITScape — KVM/arm64 guest-to-host escape tracking"
 description: "Linux kernel KVM/arm64 vGIC-ITS double-put race (CVE-2026-46316, ITScape) — guest-to-host escape — distro patch status tracker"
 layout: "single"
 date: 2026-07-08
-lastmod: 2026-07-09
+lastmod: 2026-07-11
 cover:
   image: "itscape-tracker.png"
   alt: "ITScape — Linux KVM/arm64 vGIC-ITS guest-to-host escape tracker"
@@ -154,7 +154,8 @@ RHSA-2026:34911 (`6.12.0-211.30.1.el10_2`) and **RHEL 9** in RHSA-2026:36018
 NVRs when the RLSAs land; as of this writing Rocky 10 is at
 `6.12.0-211.28.1.el10_2` and Rocky 9 at `5.14.0-687.17.1.el9_8`, both below
 the fixed builds, so both remain `:x:` (Rocky typically trails Red Hat by a
-day or two — AlmaLinux 10 has already shipped a fixed kernel). RHEL 8 /
+day or two — AlmaLinux 9 (`5.14.0-687.22.1.el9_8`) and 10 have already
+shipped fixed kernels). RHEL 8 /
 Rocky 8 (4.18) are **not affected**; Oracle Linux and CloudLinux OS track
 RHEL.
 
@@ -237,7 +238,7 @@ Neither is a fix; the kernel hole remains until patched.
 
 ## Verification log
 
-*Last verified 2026-07-09.*
+*Last verified 2026-07-11.*
 
 ### Upstream
 
@@ -274,8 +275,9 @@ Neither is a fix; the kernel hole remains until patched.
   predating upstream 6.10, so the earlier "el9 not affected" reading was
   wrong. Rocky trails: Rocky 9 `5.14.0-687.17.1.el9_8` and Rocky 10
   `6.12.0-211.28.1.el10_2` are both below the fixed builds → both remain
-  `:x:` until the RLSA rebuilds land (AlmaLinux 10 already ships
-  `6.12.0-211.30.1.el10_2`). OSV shows no Rocky ecosystem entry yet.
+  `:x:` until the RLSA rebuilds land (AlmaLinux 9 ships `5.14.0-687.22.1.el9_8`
+  via ALSA-2026:36018, and AlmaLinux 10 ships `6.12.0-211.30.1.el10_2`
+  via ALSA-2026:34911). OSV shows no Rocky ecosystem entry yet.
 - **Amazon Linux**: ALAS CVE page confirmed: AL2023 default `kernel` (6.1)
   and AL2 (4.14) **Not Affected** (< 6.10). The opt-in `kernel6.12` stream
   was fixed via ALAS2023-2026-1894 and `kernel6.18` via ALAS2023-2026-1881
