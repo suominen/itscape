@@ -123,7 +123,10 @@ thing you may leave behind is the edited tracker (and its commit).
 4. Edit site/content/_index.md to reflect any changes per the conventions in
    CLAUDE.md. If you make content changes, bump the `lastmod` date. If
    nothing changed, leave the file alone — don't bump `lastmod` on a no-op
-   run.
+   run. Never write "no change" / "unchanged from prior run" / "no verdict
+   changes this run" prose into the tracker — silence is how the tracker
+   says "unchanged". Even on a run that does change something real, touch
+   only the lines whose facts changed.
 
 5. If you made changes, commit them on the current branch (`auto-update`).
    Do NOT create a new branch, switch branches, push, or open a PR. The user

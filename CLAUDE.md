@@ -186,6 +186,13 @@ re-check. Bump the `*Last verified <date>.*` line and edit the relevant
 lives **only** in that header — do not repeat it inline. Method/source
 attribution without a date is fine.
 
+The log records **facts**, not run outcomes. Never write "no change",
+"unchanged from prior run", "no verdict changes this run", or similar prose
+anywhere in the tracker — an entry that is still accurate reports that by
+staying untouched. This applies just as much on a run that *does* change
+something real: update only the lines whose facts changed and leave every
+other line exactly as it was.
+
 ### Date handling — first-seen / last-changed, not "today"
 
 Dates in the prose are **first-seen / last-changed** dates, not "today".
