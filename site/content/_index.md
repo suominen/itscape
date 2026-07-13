@@ -3,7 +3,7 @@ title: "ITScape — KVM/arm64 guest-to-host escape tracking"
 description: "Linux kernel KVM/arm64 vGIC-ITS double-put race (CVE-2026-46316, ITScape) — guest-to-host escape — distro patch status tracker"
 layout: "single"
 date: 2026-07-08
-lastmod: 2026-07-11
+lastmod: 2026-07-13
 cover:
   image: "itscape-tracker.png"
   alt: "ITScape — Linux KVM/arm64 vGIC-ITS guest-to-host escape tracker"
@@ -115,8 +115,8 @@ named in the disclosures appear only in prose where relevant.
 | Debian | 11 (bullseye, LTS) | 5.10.223-1 | — | :white_check_mark: Not affected — predates the trigger |
 | NixOS | Unstable | 6.18.38 | 2026-07-08 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
 | NixOS | 26.05 | 6.18.38 | 2026-07-08 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
-| Rocky Linux | 10 | 6.12.0-211.28.1.el10_2 | — | :x: Vulnerable — RHEL fixed (RHSA-2026:34911, 211.30.1); Rocky rebuild pending |
-| Rocky Linux | 9 | 5.14.0-687.17.1.el9_8 | — | :x: Vulnerable — RHEL 9 affected via vGIC backport; RHSA-2026:36018 fix (687.22.1) not yet in Rocky |
+| Rocky Linux | 10 | 6.12.0-211.32.1.el10_2 | 2026-07-11 | :white_check_mark: Fixed — RLSA-2026:36956 (6.12.0-211.32.1.el10_2 ≥ 211.30.1; carries the backport) |
+| Rocky Linux | 9 | 5.14.0-687.22.1.el9_8 | 2026-07-11 | :white_check_mark: Fixed — RLSA-2026:36018 (5.14.0-687.22.1.el9_8 carries the backport) |
 | Rocky Linux | 8 | 4.18.0-553.el8_10 | — | :white_check_mark: Not affected — predates the trigger |
 | Amazon Linux | 2023 (kernel 6.1) | 6.1.176-220.360 | — | :white_check_mark: Not affected — predates v6.10 |
 | Amazon Linux | 2023 (kernel6.12) | 6.12.94-123.176 | 2026-06-22 | :white_check_mark: Fixed — ALAS2023-2026-1894 (≥ 6.12.92-122.166) |
@@ -148,14 +148,12 @@ On arm64, **EL10** (the 6.12-based el10 kernel) is in the ITScape window —
 but so is **EL9**: Red Hat backported the vGIC-ITS code into its el9 5.14
 kernel, so RHEL/Rocky 9 carry the bug despite the 5.14 base (this is why a
 version-only "predates 6.10" check is wrong for EL — only EL8's 4.18
-genuinely predates the code). Red Hat has fixed **RHEL 10** in
-RHSA-2026:34911 (`6.12.0-211.30.1.el10_2`) and **RHEL 9** in RHSA-2026:36018
-(`5.14.0-687.22.1.el9_8`). Rocky rebuilds RHEL, so its kernels reach those
-NVRs when the RLSAs land; as of this writing Rocky 10 is at
-`6.12.0-211.28.1.el10_2` and Rocky 9 at `5.14.0-687.17.1.el9_8`, both below
-the fixed builds, so both remain `:x:` (Rocky typically trails Red Hat by a
-day or two — AlmaLinux 9 (`5.14.0-687.22.1.el9_8`) and 10 have already
-shipped fixed kernels). RHEL 8 /
+genuinely predates the code). Red Hat fixed **RHEL 10** in RHSA-2026:34911
+(`6.12.0-211.30.1.el10_2`) and **RHEL 9** in RHSA-2026:36018
+(`5.14.0-687.22.1.el9_8`). Rocky landed the
+corresponding rebuilds on 2026-07-11: **Rocky 9** via RLSA-2026:36018
+(`5.14.0-687.22.1.el9_8`) and **Rocky 10** via RLSA-2026:36956
+(`6.12.0-211.32.1.el10_2`, which subsumes the 211.30.1 fix). RHEL 8 /
 Rocky 8 (4.18) are **not affected**; Oracle Linux and CloudLinux OS track
 RHEL.
 
@@ -238,7 +236,7 @@ Neither is a fix; the kernel hole remains until patched.
 
 ## Verification log
 
-*Last verified 2026-07-11.*
+*Last verified 2026-07-13.*
 
 ### Upstream
 
@@ -267,17 +265,16 @@ Neither is a fix; the kernel hole remains until patched.
 - **NixOS** (via the local nixpkgs clone at both channel revisions): the
   default `linuxPackages` (`linux_6_18`) is `6.18.38` on both nixos-unstable
   and nixos-26.05 (≥ 6.18.35) → carries the backport → fixed. No change.
-- **Rocky / RHEL family** (via the Red Hat security data API, OSV, and
-  Rocky BaseOS aarch64 repodata): Red Hat lists RHEL 8 `kernel` **Not
-  affected**, but **RHEL 9 and 10 affected and fixed** — RHSA-2026:36018
+- **Rocky / RHEL family** (via the Red Hat security data API and Rocky
+  BaseOS aarch64 repodata): Red Hat lists RHEL 8 `kernel` **Not affected**,
+  but **RHEL 9 and 10 affected and fixed** — RHSA-2026:36018
   (`5.14.0-687.22.1.el9_8`) and RHSA-2026:34911 (`6.12.0-211.30.1.el10_2`);
   RHEL 9's 5.14 kernel carries the vGIC-ITS code by backport despite
-  predating upstream 6.10, so the earlier "el9 not affected" reading was
-  wrong. Rocky trails: Rocky 9 `5.14.0-687.17.1.el9_8` and Rocky 10
-  `6.12.0-211.28.1.el10_2` are both below the fixed builds → both remain
-  `:x:` until the RLSA rebuilds land (AlmaLinux 9 ships `5.14.0-687.22.1.el9_8`
-  via ALSA-2026:36018, and AlmaLinux 10 ships `6.12.0-211.30.1.el10_2`
-  via ALSA-2026:34911). OSV shows no Rocky ecosystem entry yet.
+  predating upstream 6.10, so a version-only "predates 6.10" check is wrong
+  for EL 9. Rocky landed both rebuilds on 2026-07-11: Rocky 9 via
+  RLSA-2026:36018 (`5.14.0-687.22.1.el9_8`) and Rocky 10 via
+  RLSA-2026:36956 (`6.12.0-211.32.1.el10_2`, NVR ≥ 211.30.1 → carries the
+  backport).
 - **Amazon Linux**: ALAS CVE page confirmed: AL2023 default `kernel` (6.1)
   and AL2 (4.14) **Not Affected** (< 6.10). The opt-in `kernel6.12` stream
   was fixed via ALAS2023-2026-1894 and `kernel6.18` via ALAS2023-2026-1881
