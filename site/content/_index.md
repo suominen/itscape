@@ -10,6 +10,9 @@ cover:
   hiddenInSingle: true
 ---
 
+*This tracker is no longer updated.  Every tracked distribution has
+shipped a kernel carrying the fix or was never affected.*
+
 ## Summary
 
 | Field | Detail |
