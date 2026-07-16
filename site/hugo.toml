@@ -1,6 +1,6 @@
 baseURL = "https://kimmo.cloud/itscape/"
 locale = "en-US"
-title = "ITScape (CVE-2026-46316) — KVM/arm64 guest-to-host escape"
+title = "CVE-2026-46316 — ITScape"
 copyright = "Copyright © 2026 [Kimmo Suominen](https://kimmo.suominen.com/) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 
 enableEmoji = true
