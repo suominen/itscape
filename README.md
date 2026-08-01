@@ -1,38 +1,26 @@
 # ITScape — Linux KVM/arm64 guest-to-host escape tracking site
 
-Patch-status tracker for **ITScape** (**CVE-2026-46316**), a KVM/arm64
-guest-to-host escape in the Linux kernel.  A translation-cache double-put in
-`vgic_its_invalidate_cache()` — it drops a `vgic_irq`'s cache reference on
-the iterated pointer rather than the value returned by `xa_erase()`, and the
-function runs from mutually-non-exclusive contexts — frees the `vgic_irq`
-while an ITE still maps it under concurrent invalidation: a use-after-free a
-guest with **root/EL1** can drive to **host-kernel** code execution.
-Because the bug is in in-kernel KVM rather than QEMU userspace, the escape
-runs with host-kernel privilege.  This is the first known guest-to-host
-escape for KVM/arm64.  Discovered by Hyunwoo Kim (`@v4bel`) and
-[disclosed in 2026-07](https://thehackernews.com/2026/07/16-year-old-linux-kvm-flaw-lets-guest.html).
-Public PoC: <https://github.com/V4bel/ITScape>.
+Source for the **ITScape** patch-status tracker: a single-page site
+recording which distributions have shipped a fix for the KVM/arm64
+guest-to-host escape in the Linux kernel.
 
-The bug was introduced by `8201d1028caa` in **v6.10** (2024-04-25) and fixed
-in v7.1 by
-[`13031fb6b835`](https://github.com/torvalds/linux/commit/13031fb6b8357fbbcded2a7f4cba73e4781ee594)
-(*KVM: arm64: vgic-its: Drop the translation cache reference only for the
-erased entry*).  The practical exploitable window is arm64 kernels **6.10
-through 7.0**; kernels older than 6.10 are **not affected**.  Distro
-adoption of the backport is tracked below.
+## Where the facts live
 
-**CVE-2026-46316** is assigned (CVSS 3.1 **8.8**); the kernel CNA backported
-the fix to 6.12.93, 6.18.35, and 7.0.12.  ITScape is **arm64-only**; its
-**x86 sibling** by the same researcher is **Januscape (CVE-2026-53359)**, a
-KVM/x86 shadow-MMU escape tracked at <https://kimmo.cloud/januscape/>.
+Everything about the bug — CVE IDs, affected and fixed versions, upstream
+fix commits, discovery and disclosure credit, and final per-distribution
+patch status — belongs to the tracker page, not to this README:
 
-The rendered site is published at **<https://kimmo.cloud/itscape/>**.
-Deployment plan and current setup state live in [`WEBSITE.md`](WEBSITE.md).
+- **Rendered:** <https://kimmo.cloud/itscape/>
+- **Source:** [`site/content/_index.md`](site/content/_index.md)
 
-## Source of truth
+Edit that file; everything else in this repo is build infrastructure.
 
-The tracker is a single Hugo page: [`site/content/_index.md`](site/content/_index.md).
-Edit that file; everything else is build infrastructure.
+None of it is restated here on purpose.  A second copy in this README
+would only rot as the tracker page is revised.  Resist re-adding a
+summary.
+
+Deployment plan and current setup state live in
+[`WEBSITE.md`](WEBSITE.md).
 
 ## Local development
 
