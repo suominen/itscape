@@ -3,7 +3,7 @@ title: "ITScape — KVM/arm64 guest-to-host escape tracking"
 description: "Linux kernel KVM/arm64 vGIC-ITS double-put race (CVE-2026-46316, ITScape) — guest-to-host escape — distro patch status tracker"
 layout: "single"
 date: 2026-07-08
-lastmod: 2026-07-13
+lastmod: 2026-10-06
 cover:
   image: "itscape-tracker.png"
   alt: "ITScape — Linux KVM/arm64 vGIC-ITS guest-to-host escape tracker"
@@ -111,13 +111,13 @@ named in the disclosures appear only in prose where relevant.
 
 | Distribution | Release | Kernel | Fixed since | Status |
 |---|---|---|---|---|
-| Debian | sid (unstable) | 7.1.3-1 | 2026-07-08 | :white_check_mark: Fixed — ships 7.1.3 (carries the fix) |
-| Debian | forky (testing) | 7.0.13-1 | 2026-07-08 | :white_check_mark: Fixed — 7.0.13 ≥ 7.0.12 (carries the backport) |
-| Debian | 13 (trixie) | 6.12.95-1 | 2026-07-08 | :white_check_mark: Fixed — 6.12.95-1 via trixie-security (DSA-6355-1; ≥ 6.12.93) |
+| Debian | sid (unstable) | 7.1.3-1 | 2026-06-10 | :white_check_mark: Fixed — ships 7.1.3 (carries the fix) |
+| Debian | forky (testing) | 7.0.13-1 | 2026-06-18 | :white_check_mark: Fixed — 7.0.13 ≥ 7.0.12 (carries the backport) |
+| Debian | 13 (trixie) | 6.12.95-1 | 2026-06-21 | :white_check_mark: Fixed — DSA-6355-1 (`6.12.94-1`) |
 | Debian | 12 (bookworm) | 6.1.170-3 | — | :white_check_mark: Not affected — predates the trigger (< 6.10) |
 | Debian | 11 (bullseye, LTS) | 5.10.223-1 | — | :white_check_mark: Not affected — predates the trigger |
-| NixOS | Unstable | 6.18.38 | 2026-07-08 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
-| NixOS | 26.05 | 6.18.38 | 2026-07-08 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
+| NixOS | Unstable | 6.18.38 | 2026-06-12 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
+| NixOS | 26.05 | 6.18.38 | 2026-06-13 | :white_check_mark: Fixed — ships 6.18.38 (carries the backport) |
 | Rocky Linux | 10 | 6.12.0-211.32.1.el10_2 | 2026-07-11 | :white_check_mark: Fixed — RLSA-2026:36956 (6.12.0-211.32.1.el10_2 ≥ 211.30.1; carries the backport) |
 | Rocky Linux | 9 | 5.14.0-687.22.1.el9_8 | 2026-07-11 | :white_check_mark: Fixed — RLSA-2026:36018 (5.14.0-687.22.1.el9_8 carries the backport) |
 | Rocky Linux | 8 | 4.18.0-553.el8_10 | — | :white_check_mark: Not affected — predates the trigger |
@@ -133,9 +133,8 @@ named in the disclosures appear only in prose where relevant.
 
 Debian's arm64 `linux` is affected only from 6.10 on. **sid** (`7.1.3-1`,
 carries the fix) and **forky** (testing, `7.0.13-1` ≥ the first-fixed
-7.0.12) are fixed. **trixie** stable received `6.12.95-1` via
-`trixie-security` (DSA-6355-1); since 6.12.95 ≥ 6.12.93 it carries the
-backport — trixie is now fixed. **bookworm** (6.1) and **bullseye** (5.10)
+7.0.12) are fixed. **trixie** stable is fixed through `trixie-security`
+(DSA-6355-1). **bookworm** (6.1) and **bullseye** (5.10)
 predate the v6.10 trigger and are not affected.
 
 ### NixOS
@@ -260,14 +259,21 @@ Neither is a fix; the kernel hole remains until patched.
 ### Distributions
 
 - **Debian** (via the dak `madison` API and Debian security tracker): unstable
-  `7.1.3-1` and testing `7.0.13-1` carry the fix → fixed. Trixie received
-  `6.12.95-1` via `trixie-security` (DSA-6355-1; ≥ 6.12.93, carries the
-  backport) → trixie now fixed; status flipped from `:warning:` to
-  `:white_check_mark:`. Oldstable `6.1.170-3` and oldoldstable
+  `7.1.3-1` and testing `7.0.13-1` carry the fix → fixed. The security
+  tracker's fixed version for unstable is `7.0.12-1`, first seen on
+  snapshot.debian.org 2026-06-10. Testing first carried a fixed kernel
+  when `7.0.12-2` migrated on 2026-06-18, per snapshot.debian.org's
+  `dists/testing` index. Trixie is fixed by DSA-6355-1 (2026-06-21),
+  `6.12.94-1` in `trixie-security`, per the security tracker's DSA
+  list. Oldstable `6.1.170-3` and oldoldstable
   `5.10.223-1` predate the v6.10 trigger → not affected.
 - **NixOS** (via the local nixpkgs clone at both channel revisions): the
   default `linuxPackages` (`linux_6_18`) is `6.18.38` on both nixos-unstable
-  and nixos-26.05 (≥ 6.18.35) → carries the backport → fixed. No change.
+  and nixos-26.05 (≥ 6.18.35) → carries the backport → fixed. The fix
+  arrived with `linux_6_18: 6.18.34 -> 6.18.35` (`4e8d7d7406b6` on
+  `master`, `7d2253212027` on `release-26.05`); `nixos-first-shipped`
+  dates nixos-unstable's first containing release 2026-06-12 and
+  nixos-26.05's 2026-06-13.
 - **Rocky / RHEL family** (via the Red Hat security data API and Rocky
   BaseOS aarch64 repodata): Red Hat lists RHEL 8 `kernel` **Not affected**,
   but **RHEL 9 and 10 affected and fixed** — RHSA-2026:36018
